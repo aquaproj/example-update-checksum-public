@@ -60,12 +60,6 @@ jobs:
           # https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
           # > When you use the repository's GITHUB_TOKEN to perform tasks, events triggered by the GITHUB_TOKEN, with the exception of workflow_dispatch and repository_dispatch, will not create a new workflow run.
           GITHUB_TOKEN: ${{steps.generate_token.outputs.token}}
-      - run: gh -R "$GITHUB_REPOSITORY" pr merge --merge --auto --delete-branch "$PR_NUMBER"
-        if: |
-          github.event.pull_request.user.login == 'renovate[bot]' && contains(github.event.pull_request.body, ' **Automerge**: Enabled.')
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-          PR_NUMBER: ${{github.event.pull_request.number}}
 
   update-aqua-checksums_fork:
     # Test if aqua-checksums.json is latest
@@ -115,6 +109,23 @@ jobs:
     if: needs.path-filter.outputs.renovate-config-validator == 'true'
     permissions:
       contents: read
+
+  enable-automerge:
+    # Enable automerge to merge pull requests from Renovate automatically.
+    runs-on: ubuntu-latest
+    needs:
+      - update-aqua-checksums
+      - update-aqua-checksums_fork
+      - test
+      - renovate-config-validator
+    permissions: {}
+    if: |
+      success() && github.event.pull_request.user.login == 'renovate[bot]' && contains(github.event.pull_request.body, ' **Automerge**: Enabled.')
+    steps:
+      - run: gh -R "$GITHUB_REPOSITORY" pr merge --merge --auto --delete-branch "$PR_NUMBER"
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+          PR_NUMBER: ${{github.event.pull_request.number}}
 
   status-check:
     # This job is used for main branch's branch protection rule's status check.
