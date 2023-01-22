@@ -94,8 +94,10 @@ jobs:
     permissions:
       contents: write # For enable automerge
       pull-requests: write # For enable automerge
+    # "! failure()" is required. success() returns false if dependent jobs are skipped. https://github.com/community/community/discussions/45058
+    # By default success() is used so we have to override success() by "! failure()"
     if: |
-      success() && github.event.pull_request.user.login == 'renovate[bot]' && contains(github.event.pull_request.body, ' **Automerge**: Enabled.')
+      ! failure() && github.event.pull_request.user.login == 'renovate[bot]' && contains(github.event.pull_request.body, ' **Automerge**: Enabled.')
     steps:
       - run: gh -R "$GITHUB_REPOSITORY" pr merge --merge --auto --delete-branch "$PR_NUMBER"
         env:
