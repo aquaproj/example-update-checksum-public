@@ -1,0 +1,46 @@
+# Merge pull requests from Renovate automatically under secure settings
+
+In this document, we describe how to set up CI to merge pull requests from Renovate automatically under secure settings.
+
+## Goals
+
+- Merge pull requests from Renovate automatically
+- Support pull requests from fork repositories
+
+## Secure Settings
+
+Set up branch protections.
+
+- `main`
+  - `Require a pull request before merging`
+  - `Require status checks to pass before merging`
+    - `Status checks that are required.`: `status-check`
+- `renovate/*` 
+  - `Do not allow bypassing the above settings`
+  - `Allow deletions`
+
+## Repository Setting
+
+- Allow auto-merge
+
+## GitHub Apps
+
+Create one GitHub App and install it to a repository.
+
+- `aqua-update-checksum-public`
+  - Permissions
+    - `contents: write`
+      - Update `aqua-checksums.json` and push a commit to a pull request
+      - Enable automerge
+    - `pull-requests: write`: Enable Automerge
+
+## Repository Secrets
+
+Create Repository Secrets.
+
+- `APP_ID`: GitHub App ID
+- `APP_PRIVATE_KEY`: GitHub App Private Key
+
+## GitHub Actions Workflow
+
+Please see [.github/workflows](.github/workflows).
