@@ -22,7 +22,6 @@ jobs:
   actionlint_fork:
     # Lint GitHub Actions Workflows by actionlint.
     if: github.event.pull_request.head.repo.fork
-    needs: path-filter
     runs-on: ubuntu-latest
     permissions: {}
     steps:
