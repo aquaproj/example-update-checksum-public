@@ -99,9 +99,15 @@ jobs:
     if: |
       ! failure() && github.event.pull_request.user.login == 'renovate[bot]' && contains(github.event.pull_request.body, ' **Automerge**: Enabled.')
     steps:
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@021a2405c7f990db57f5eae5397423dcc554159c # v1
+        with:
+          app_id: ${{secrets.APP_ID}}
+          private_key: ${{secrets.APP_PRIVATE_KEY}}
       - run: gh -R "$GITHUB_REPOSITORY" pr merge --merge --auto --delete-branch "$PR_NUMBER"
         env:
-          GITHUB_TOKEN: ${{github.token}}
+          GITHUB_TOKEN: ${{github.token}} # TODO Use GitHub App to trigger GitHub Actions Workflow by merge commit.
           PR_NUMBER: ${{github.event.pull_request.number}}
 
   status-check:
