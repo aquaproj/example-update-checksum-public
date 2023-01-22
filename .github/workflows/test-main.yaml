@@ -1,0 +1,24 @@
+---
+name: test
+
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3
+      - uses: aquaproj/aqua-installer@61e2563dfe7674cbf74fe6ec212e444198a3bb00 # v2.0.2
+        with:
+          aqua_version: v1.32.0
+        env:
+          AQUA_GITHUB_TOKEN: ${{github.token}}
+      - run: tfcmt -v
+        env:
+          AQUA_GITHUB_TOKEN: ${{github.token}}
