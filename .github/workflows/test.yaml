@@ -11,7 +11,6 @@ jobs:
     outputs:
       update-aqua-checksums: ${{steps.changes.outputs.update-aqua-checksums}}
       renovate-config-validator: ${{steps.changes.outputs.renovate-config-validator}}
-      actionlint: ${{steps.changes.outputs.actionlint}}
     runs-on: ubuntu-latest
     permissions: {}
     steps:
@@ -26,10 +25,6 @@ jobs:
               - .github/workflows/test.yaml
             renovate-config-validator:
               - renovate.json5
-            actionlint:
-              - aqua/actionlint.yaml
-              - aqua/reviewdog.yaml
-              - .github/workflows/*.yaml
 
   update-aqua-checksums:
     # Update aqua-checksums.json and push a commit
@@ -97,32 +92,6 @@ jobs:
     permissions:
       contents: read
 
-  actionlint:
-    # Lint GitHub Actions Workflows by actionlint.
-    if: |
-      needs.path-filter.outputs.actionlint == 'true' && ! github.event.pull_request.head.repo.fork
-    needs: path-filter
-    permissions:
-      pull-requests: write
-      contents: read
-    uses: suzuki-shunsuke/actionlint-workflow/.github/workflows/actionlint.yaml@0c06ab0fadfa4f27569001388515dafdabc11bb3 # v0.2.0
-
-  actionlint_fork:
-    # Lint GitHub Actions Workflows by actionlint.
-    if: |
-      needs.path-filter.outputs.actionlint == 'true' && github.event.pull_request.head.repo.fork
-    needs: path-filter
-    runs-on: ubuntu-latest
-    permissions: {}
-    steps:
-      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3
-      - uses: aquaproj/aqua-installer@61e2563dfe7674cbf74fe6ec212e444198a3bb00 # v2.0.2
-        with:
-          aqua_version: v1.32.0
-      - run: actionlint
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-
   status-check:
     # This job is used for main branch's branch protection rule's status check.
     # If all dependent jobs succeed or are skipped this job succeeds.
@@ -131,8 +100,6 @@ jobs:
       - update-aqua-checksums
       - test
       - renovate-config-validator
-      - actionlint
-      - actionlint_fork
     permissions: {}
     if: failure()
     steps:
