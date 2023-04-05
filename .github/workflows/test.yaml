@@ -41,6 +41,9 @@ jobs:
       - status-check
     if: |
       github.event.pull_request.user.login == 'renovate[bot]' && contains(github.event.pull_request.body, ' **Automerge**: Enabled.')
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
 
   renovate-config-validator:
     uses: ./.github/workflows/wc-renovate-config-validator.yaml
