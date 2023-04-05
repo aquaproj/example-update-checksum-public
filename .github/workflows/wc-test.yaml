@@ -1,0 +1,9 @@
+---
+name: test
+on: workflow_call
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - run: echo test
