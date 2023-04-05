@@ -4,9 +4,9 @@ on:
   workflow_call:
     secrets:
       gh_app_id:
-        required: false
+        required: true
       gh_app_private_key:
-        required: false
+        required: true
 jobs:
   update-aqua-checksums:
     # Update aqua-checksums.json and push a commit
