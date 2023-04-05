@@ -32,14 +32,20 @@ jobs:
       - update-aqua-checksums
       - test
     permissions: {}
-    # https://github.com/orgs/community/discussions/45058
-    # https://github.com/actions/runner/issues/491
-    # This job is run when all needs' jobs succeed and the pull request is created by Renovate and Renovate's automerge is enabled.
+    if: failure()
+
+  enable-auto-merge:
+    uses: ./.github/workflows/wc-enable-auto-merge.yaml
+    permissions: {}
+    needs:
+      - status-check
     if: |
-      ! failure() && ! cancelled() && github.event.pull_request.user.login == 'renovate[bot]' && contains(github.event.pull_request.body, ' **Automerge**: Enabled.')
+      github.event.pull_request.user.login == 'renovate[bot]' && contains(github.event.pull_request.body, ' **Automerge**: Enabled.')
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
 
   renovate-config-validator:
-    # Validate Renovate Configuration by renovate-config-validator.
     uses: ./.github/workflows/wc-renovate-config-validator.yaml
     needs: path-filter
     if: needs.path-filter.outputs.renovate-config-validator == 'true'
